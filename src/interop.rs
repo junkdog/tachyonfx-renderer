@@ -1,7 +1,11 @@
 use std::sync::mpsc::Sender;
+
 use wasm_bindgen::prelude::*;
-use crate::dispatcher::Dispatcher;
-use crate::event::AppEvent::{self, *};
+
+use crate::{
+    dispatcher::Dispatcher,
+    event::AppEvent::{self, *},
+};
 
 #[wasm_bindgen]
 pub fn compile_dsl(s: &str) {
@@ -12,7 +16,6 @@ pub fn compile_dsl(s: &str) {
 pub fn update_canvas(s: &str) {
     sender().dispatch(ReplaceCanvas(s.into()));
 }
-
 
 fn sender() -> Sender<AppEvent> {
     unsafe {
@@ -30,9 +33,7 @@ struct JsSender {
 
 pub fn init_global_state(sender: Sender<AppEvent>) {
     unsafe {
-        SENDER = Some(JsSender {
-            event_sender: sender,
-        });
+        SENDER = Some(JsSender { event_sender: sender });
     }
 }
 

@@ -1,12 +1,14 @@
 use ansi_to_tui::IntoText;
-use ratatui::buffer::Buffer;
-use ratatui::layout::{Offset, Rect};
-use ratatui::widgets::Widget;
-use ratatui::Frame;
-use tachyonfx::{blit_buffer, BufferRenderer, Duration, Effect, EffectManager};
-use tachyonfx::dsl::EffectDsl;
+use ratatui::{
+    Frame,
+    buffer::Buffer,
+    layout::{Offset, Rect},
+    widgets::Widget,
+};
+use tachyonfx::{BufferRenderer, Duration, Effect, EffectManager, blit_buffer, dsl::EffectDsl};
 use unicode_segmentation::UnicodeSegmentation;
 use wasm_bindgen::JsValue;
+
 use crate::event::AppEvent;
 
 pub struct App {
@@ -34,7 +36,8 @@ impl App {
         blit_buffer(&self.canvas_buf, &mut frame.buffer_mut(), Offset::default());
 
         let area = frame.area();
-        self.effects.process_effects(elapsed, frame.buffer_mut(), area);
+        self.effects
+            .process_effects(elapsed, frame.buffer_mut(), area);
     }
 
     pub fn register_effect(&mut self, effect: Effect) {
@@ -44,10 +47,10 @@ impl App {
     pub fn apply_event(&mut self, event: AppEvent) {
         match event {
             AppEvent::Tick => (),
-            AppEvent::Resize(_w, _h) => {}
+            AppEvent::Resize(_w, _h) => {},
             AppEvent::ReplaceCanvas(ansi) => self.update_canvas(ansi),
             AppEvent::CompileDsl(code) => self.compile_dsl(code),
-            AppEvent::ReplayCurrentEffect => {}
+            AppEvent::ReplayCurrentEffect => {},
         }
     }
 
@@ -56,7 +59,8 @@ impl App {
     }
 
     fn update_canvas(&mut self, source: String) {
-        let w = source.lines()
+        let w = source
+            .lines()
             .map(terminal_cell_width)
             .max()
             .unwrap_or(0);
@@ -86,13 +90,15 @@ impl App {
                     e.start_line(),
                     e.start_column()
                 );
-            }
+            },
         }
     }
 
     fn tick(&mut self) -> Duration {
         let now = web_time::Instant::now();
-        let elapsed = now.duration_since(self.last_tick_instant).as_millis();
+        let elapsed = now
+            .duration_since(self.last_tick_instant)
+            .as_millis();
 
         self.last_tick_instant = now;
         self.last_tick_duration = Duration::from_millis(elapsed as u32);

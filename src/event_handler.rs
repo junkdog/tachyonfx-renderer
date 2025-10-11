@@ -1,6 +1,6 @@
 use std::sync::mpsc;
-use crate::dispatcher::Dispatcher;
-use crate::event::AppEvent;
+
+use crate::{dispatcher::Dispatcher, event::AppEvent};
 
 #[derive(Debug)]
 pub struct EventHandler {
@@ -25,7 +25,7 @@ impl EventHandler {
     pub fn try_next(&self) -> Option<AppEvent> {
         match self.receiver.try_recv() {
             Ok(e) => Some(e),
-            Err(_) => None
+            Err(_) => None,
         }
     }
 
@@ -39,7 +39,6 @@ impl Dispatcher<AppEvent> for EventHandler {
         let _ = self.sender.send(event);
     }
 }
-
 
 pub struct EventIter<'a> {
     handler: &'a EventHandler,
