@@ -46,6 +46,7 @@ impl App {
             AppEvent::Resize(w, h) => {}
             AppEvent::ReplaceCanvas(ansi) => {}
             AppEvent::CompileDsl(code) => {}
+            AppEvent::ReplayCurrentEffect => {}
         }
     }
 
