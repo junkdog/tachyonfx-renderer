@@ -1,4 +1,4 @@
-use ratatui::{Frame, Terminal};
+use ratatui::Terminal;
 use ratzilla::backend::webgl2::WebGl2BackendOptions;
 use ratzilla::{WebGl2Backend, WebRenderer};
 use eyre::Result;
@@ -19,16 +19,12 @@ fn main() -> Result<()> {
     let events = EventHandler::new(core::time::Duration::from_millis(33));
     init_global_state(events.sender());
 
-    let options = WebGl2BackendOptions::new()
-            .enable_console_debug_api()
-            .enable_mouse_selection()
-            .grid_id("container")
-            .measure_performance(true);
-
-    let backend = WebGl2Backend::new_with_options(options)
-        .map_err(|e| eyre::eyre!("{:?}", e))?;
-    let terminal = Terminal::new(backend)
-        .map_err(|e| eyre::eyre!("{:?}", e))?;
+    let terminal = create_terminal(WebGl2BackendOptions::new()
+        .enable_console_debug_api()
+        .enable_mouse_selection()
+        .grid_id("container")
+        .measure_performance(true)
+    )?;
 
 
     let mut app = app::App::new(events.sender());
@@ -38,18 +34,17 @@ fn main() -> Result<()> {
             app.apply_event(e);
         }
 
-        let elapsed = app.tick();
-        let area = frame.area();
-
-        render_ui(frame);
-        app.process_effects(elapsed, frame.buffer_mut(), area);
+        app.render(frame);
     });
 
     Ok(())
 }
 
-fn render_ui(
-    f: &mut Frame<'_>,
-) {
-    let screen = f.area().as_size();
+fn create_terminal(options: WebGl2BackendOptions) -> Result<Terminal<WebGl2Backend>> {
+    let backend = WebGl2Backend::new_with_options(options)
+        .map_err(|e| eyre::eyre!("{:?}", e))?;
+    let terminal = Terminal::new(backend)
+        .map_err(|e| eyre::eyre!("{:?}", e))?;
+    
+    Ok(terminal)
 }

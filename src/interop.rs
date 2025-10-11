@@ -1,6 +1,3 @@
-use base64::{engine::general_purpose::URL_SAFE_NO_PAD, Engine};
-use flate2::{write::DeflateEncoder, Compression};
-use std::io::Write;
 use std::sync::mpsc::Sender;
 use wasm_bindgen::prelude::*;
 use crate::dispatcher::Dispatcher;
