@@ -7,7 +7,6 @@ use crate::interop::init_global_state;
 
 mod app;
 mod dispatcher;
-mod effects;
 mod event;
 mod event_handler;
 mod theme;
@@ -26,9 +25,7 @@ fn main() -> Result<()> {
         .measure_performance(true)
     )?;
 
-
-    let mut app = app::App::new(events.sender());
-
+    let mut app = app::App::new();
     terminal.draw_web(move |frame| {
         for e in events.iter() {
             app.apply_event(e);
@@ -45,6 +42,6 @@ fn create_terminal(options: WebGl2BackendOptions) -> Result<Terminal<WebGl2Backe
         .map_err(|e| eyre::eyre!("{:?}", e))?;
     let terminal = Terminal::new(backend)
         .map_err(|e| eyre::eyre!("{:?}", e))?;
-    
+
     Ok(terminal)
 }

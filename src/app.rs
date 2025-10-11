@@ -5,6 +5,7 @@ use ratatui::widgets::Widget;
 use ratatui::Frame;
 use tachyonfx::{blit_buffer, BufferRenderer, Duration, Effect, EffectManager};
 use tachyonfx::dsl::EffectDsl;
+use unicode_segmentation::UnicodeSegmentation;
 use wasm_bindgen::JsValue;
 use crate::event::AppEvent;
 
@@ -13,14 +14,12 @@ pub struct App {
     canvas_buf: Buffer,
     last_tick_instant: web_time::Instant,
     last_tick_duration: Duration,
-    sender: std::sync::mpsc::Sender<AppEvent>,
 }
 
 impl App {
-    pub fn new(sender: std::sync::mpsc::Sender<AppEvent>) -> Self {
+    pub fn new() -> Self {
         let area = Rect::new(0, 0, 20, 10);
         Self {
-            sender,
             effects: Default::default(),
             canvas_buf: Buffer::empty(area),
             last_tick_instant: web_time::Instant::now(),
@@ -57,23 +56,21 @@ impl App {
     }
 
     fn update_canvas(&mut self, source: String) {
-        let Ok(text) = source.into_text() else {
+        let w = source.lines()
+            .map(terminal_cell_width)
+            .max()
+            .unwrap_or(0);
+
+        let Ok(canvas) = source.into_text() else {
             web_sys::console::error_1(&JsValue::from_str("Failed to parse ANSI input"));
             return;
         };
 
-        let w = text
-            .lines
-            .iter()
-            .map(|line| line.width())
-            .max()
-            .unwrap_or(0);
-        let h = text.lines.len();
+        let h = canvas.lines.len();
 
         let area = Rect::new(0, 0, w as u16, h as u16);
         self.resize_canvas(area);
-
-        text.render(area, &mut self.canvas_buf);
+        canvas.render(area, &mut self.canvas_buf);
     }
 
     fn compile_dsl(&mut self, dsl: String) {
@@ -93,10 +90,6 @@ impl App {
         }
     }
 
-    pub fn sender(&self) -> std::sync::mpsc::Sender<AppEvent> {
-        self.sender.clone()
-    }
-
     fn tick(&mut self) -> Duration {
         let now = web_time::Instant::now();
         let elapsed = now.duration_since(self.last_tick_instant).as_millis();
@@ -106,4 +99,10 @@ impl App {
 
         self.last_tick_duration
     }
+}
+
+fn terminal_cell_width(line: &str) -> usize {
+    line.graphemes(true)
+        .map(|g| if emojis::get(g).is_some() { 2 } else { 1 })
+        .sum()
 }
