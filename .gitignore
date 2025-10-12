@@ -2,3 +2,4 @@
 Cargo.lock
 /dist
 /pkg
+package-lock.json 
