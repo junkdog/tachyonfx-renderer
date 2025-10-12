@@ -42,7 +42,7 @@ renderer.destroy();
 Creates a renderer instance.
 
 - `containerId`: DOM element ID for the canvas
-- `dslCode`: Effect DSL (see [tachyonfx DSL docs](https://github.com/junkdog/tachyonfx/blob/main/docs/dsl.md))
+- `dslCode`: Effect DSL (see [tachyonfx DSL docs](https://github.com/junkdog/tachyonfx/blob/development/docs/dsl.md))
 - `ansiContent`: ANSI-formatted text
 
 Returns a `TachyonRenderer` handle.
