@@ -30,8 +30,7 @@ module.exports = {
     }),
     new CopyWebpackPlugin({
       patterns: [
-        { from: '../pkg', to: 'pkg' },
-        { from: '../*.ansi', to: './' }
+        { from: '../pkg', to: 'pkg' }
       ],
     }),
   ],

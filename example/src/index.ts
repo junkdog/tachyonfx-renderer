@@ -1,3 +1,5 @@
+import { DEFAULT_CANVAS_ANSI, KEY_PRESS_FX_ANSI } from './ansi-content';
+
 // Dynamic imports for WASM module
 type TachyonModule = typeof import('tachyonfx-renderer');
 
@@ -31,24 +33,15 @@ const COMPLEX_EFFECT = `
   ])
 `;
 
-async function loadAnsiFile(path: string): Promise<string> {
-  const response = await fetch(path);
-  return await response.text();
-}
-
 class RendererDemo {
   private renderer1: any = null;
   private renderer2: any = null;
-  private canvas1Content: string = '';
-  private canvas2Content: string = '';
+  private canvas1Content: string = DEFAULT_CANVAS_ANSI;
+  private canvas2Content: string = KEY_PRESS_FX_ANSI;
 
   async initialize() {
     // Initialize WASM module
     await initWasm();
-
-    // Load ANSI content
-    this.canvas1Content = await loadAnsiFile('default_canvas.ansi');
-    this.canvas2Content = await loadAnsiFile('key-press-fx.ansi');
 
     // Create both renderers
     this.renderer1 = createRenderer('canvas1', SLIDE_IN_EFFECT, this.canvas1Content);
