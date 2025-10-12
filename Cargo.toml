@@ -3,6 +3,13 @@ name = "tachyonfx-renderer"
 version = "0.1.0"
 edition = "2024"
 
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[[bin]]
+name = "tachyonfx-renderer"
+path = "src/main.rs"
+
 [dependencies]
 ansi-to-tui = "7.0.0"
 console_error_panic_hook = "0.1"
