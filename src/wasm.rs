@@ -1,8 +1,8 @@
 use std::{
     collections::HashMap,
     sync::{
-        LazyLock, Mutex,
-        atomic::{AtomicU32, Ordering},
+        Arc, LazyLock, Mutex,
+        atomic::{AtomicBool, AtomicU32, Ordering},
         mpsc::Sender,
     },
 };
@@ -21,24 +21,45 @@ use crate::{
 // Global instance ID counter
 static NEXT_INSTANCE_ID: AtomicU32 = AtomicU32::new(0);
 
-// Registry of event senders for each instance
-static SENDERS: LazyLock<Mutex<HashMap<u32, Sender<AppEvent>>>> =
+// Instance data stored in registry
+struct InstanceData {
+    sender: Sender<AppEvent>,
+    running: Arc<AtomicBool>,
+}
+
+// Registry of instance data
+static INSTANCES: LazyLock<Mutex<HashMap<u32, InstanceData>>> =
     LazyLock::new(|| Mutex::new(HashMap::new()));
 
 fn next_instance_id() -> u32 {
     NEXT_INSTANCE_ID.fetch_add(1, Ordering::Relaxed)
 }
 
-fn register_sender(id: u32, sender: Sender<AppEvent>) {
-    SENDERS.lock().unwrap().insert(id, sender);
+fn register_instance(id: u32, sender: Sender<AppEvent>, running: Arc<AtomicBool>) {
+    INSTANCES
+        .lock()
+        .unwrap()
+        .insert(id, InstanceData { sender, running });
 }
 
 fn get_sender(id: u32) -> Option<Sender<AppEvent>> {
-    SENDERS.lock().unwrap().get(&id).cloned()
+    INSTANCES
+        .lock()
+        .unwrap()
+        .get(&id)
+        .map(|data| data.sender.clone())
 }
 
-fn remove_sender(id: u32) {
-    SENDERS.lock().unwrap().remove(&id);
+fn get_running_flag(id: u32) -> Option<Arc<AtomicBool>> {
+    INSTANCES
+        .lock()
+        .unwrap()
+        .get(&id)
+        .map(|data| data.running.clone())
+}
+
+fn remove_instance(id: u32) {
+    INSTANCES.lock().unwrap().remove(&id);
 }
 
 #[wasm_bindgen]
@@ -65,9 +86,18 @@ pub fn create_renderer(
     let terminal = create_terminal(container_id)
         .map_err(|e| JsValue::from_str(&format!("Failed to create terminal: {}", e)))?;
 
-    // Start render loop
+    // Create running flag (starts as true)
+    let running = Arc::new(AtomicBool::new(true));
+    let running_clone = running.clone();
+
+    // Start render loop with state check
     let mut app = App::new();
     terminal.draw_web(move |frame| {
+        // Only render if instance is running
+        if !running_clone.load(Ordering::Relaxed) {
+            return;
+        }
+
         for event in events.iter() {
             app.apply_event(event);
         }
@@ -76,7 +106,7 @@ pub fn create_renderer(
 
     // Register instance and return handle
     let instance_id = next_instance_id();
-    register_sender(instance_id, sender);
+    register_instance(instance_id, sender, running);
 
     Ok(TachyonRenderer { instance_id })
 }
@@ -95,9 +125,34 @@ impl TachyonRenderer {
         }
     }
 
+    pub fn start(&self) {
+        if let Some(running) = get_running_flag(self.instance_id) {
+            running.store(true, Ordering::Relaxed);
+        }
+    }
+
+    pub fn stop(&self) {
+        if let Some(running) = get_running_flag(self.instance_id) {
+            running.store(false, Ordering::Relaxed);
+        }
+    }
+
+    pub fn is_running(&self) -> bool {
+        get_running_flag(self.instance_id)
+            .map(|running| running.load(Ordering::Relaxed))
+            .unwrap_or(false)
+    }
+
     pub fn destroy(self) {
-        remove_sender(self.instance_id);
+        // Stop rendering
+        if let Some(running) = get_running_flag(self.instance_id) {
+            running.store(false, Ordering::Relaxed);
+        }
+
+        // Remove from registry
+        remove_instance(self.instance_id);
+
         // Note: Cannot stop the render loop yet - ratzilla doesn't support it
-        // The loop will continue but updates will be ignored since sender is removed
+        // The loop will continue but won't render anything since running flag is false
     }
 }
