@@ -10,11 +10,7 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "outDir": "./dist",
-    "rootDir": "./src",
-    "baseUrl": ".",
-    "paths": {
-      "tachyonfx-renderer": ["../pkg/tachyonfx_renderer"]
-    }
+    "rootDir": "./src"
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules"]

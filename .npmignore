@@ -1,0 +1,11 @@
+target/
+.git/
+.gitignore
+Cargo.lock
+src/
+example/
+*.ansi
+build-wasm.sh
+Trunk.toml
+index.html
+CLAUDE.md

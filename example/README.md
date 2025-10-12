@@ -2,14 +2,6 @@
 
 This example demonstrates how to use the TachyonFX Renderer WebAssembly library in a TypeScript application with webpack.
 
-## Features
-
-- **Dual Canvas Demo**: Two independent renderer instances running simultaneously
-- **Full API Coverage**: Demonstrates all available methods from the JavaScript API
-- **ANSI Content**: Loads and displays the two `.ansi` files from the project root
-- **Effect DSL**: Shows how to use and update effects using the tachyonfx DSL
-- **Lifecycle Control**: Start, stop, replay, and destroy renderers
-
 ## Quick Start
 
 **1. Build the WASM library** (from project root):
@@ -43,27 +35,6 @@ npm run dev
 ```
 
 Then open http://localhost:8080 in your browser.
-
-### Production Build
-
-```bash
-npm run build
-```
-
-The built files will be in the `example/dist` directory.
-
-## Project Structure
-
-```
-example/
-├── src/
-│   ├── index.ts       # Main TypeScript application
-│   └── index.html     # HTML template
-├── package.json       # Dependencies and scripts
-├── tsconfig.json      # TypeScript configuration
-├── webpack.config.js  # Webpack configuration
-└── README.md         # This file
-```
 
 ## API Usage
 
@@ -133,29 +104,3 @@ fx: [
 ]
 `;
 ```
-
-## Troubleshooting
-
-### Module not found errors
-
-Make sure you've built the WASM module first (see Prerequisites above).
-
-### Canvas not rendering
-
-1. Check browser console for errors
-2. Ensure the container element IDs match in HTML and TypeScript
-3. Verify the WASM module initialized successfully
-
-### ANSI files not loading
-
-The webpack config copies `.ansi` files from the project root. Ensure they exist:
-- `default_canvas.ansi`
-- `key-press-fx.ansi`
-
-## Browser Compatibility
-
-- Chrome/Edge: ✅ Full support
-- Firefox: ✅ Full support
-- Safari: ✅ Full support (14.1+)
-
-Requires WebAssembly and WebGL2 support.
