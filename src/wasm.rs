@@ -67,7 +67,7 @@ pub struct TachyonRenderer {
     instance_id: u32,
 }
 
-#[wasm_bindgen]
+#[wasm_bindgen(js_name = createRenderer)]
 pub fn create_renderer(
     container_id: &str,
     dsl_code: &str,
@@ -113,15 +113,24 @@ pub fn create_renderer(
 
 #[wasm_bindgen]
 impl TachyonRenderer {
+    #[wasm_bindgen(js_name = updateCanvas)]
     pub fn update_canvas(&self, ansi_content: &str) {
         if let Some(sender) = get_sender(self.instance_id) {
             sender.dispatch(ReplaceCanvas(ansi_content.into()));
         }
     }
 
+    #[wasm_bindgen(js_name = updateEffect)]
     pub fn update_effect(&self, dsl_code: &str) {
         if let Some(sender) = get_sender(self.instance_id) {
             sender.dispatch(CompileDsl(dsl_code.into()));
+        }
+    }
+
+    #[wasm_bindgen(js_name = replayEffect)]
+    pub fn replay_effect(&self) {
+        if let Some(sender) = get_sender(self.instance_id) {
+            sender.dispatch(ReplayCurrentEffect);
         }
     }
 
@@ -137,6 +146,7 @@ impl TachyonRenderer {
         }
     }
 
+    #[wasm_bindgen(js_name = isRunning)]
     pub fn is_running(&self) -> bool {
         get_running_flag(self.instance_id)
             .map(|running| running.load(Ordering::Relaxed))
