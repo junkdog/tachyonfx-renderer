@@ -1,3 +1,4 @@
+use app::App;
 use eyre::Result;
 use ratatui::Terminal;
 use ratzilla::{WebGl2Backend, WebRenderer, backend::webgl2::WebGl2BackendOptions};
@@ -9,6 +10,7 @@ mod dispatcher;
 mod event;
 mod event_handler;
 mod interop;
+mod log;
 mod theme;
 
 fn main() -> Result<()> {
@@ -25,7 +27,13 @@ fn main() -> Result<()> {
             .measure_performance(true),
     )?;
 
-    let mut app = app::App::new();
+    run_app(events, terminal);
+
+    Ok(())
+}
+
+fn run_app(events: EventHandler, terminal: Terminal<WebGl2Backend>) {
+    let mut app = App::new();
     terminal.draw_web(move |frame| {
         for e in events.iter() {
             app.apply_event(e);
@@ -33,8 +41,6 @@ fn main() -> Result<()> {
 
         app.render(frame);
     });
-
-    Ok(())
 }
 
 fn create_terminal(options: WebGl2BackendOptions) -> Result<Terminal<WebGl2Backend>> {

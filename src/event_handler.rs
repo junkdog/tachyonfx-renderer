@@ -18,10 +18,6 @@ impl EventHandler {
         self.sender.clone()
     }
 
-    pub fn next(&self) -> Result<AppEvent, mpsc::RecvError> {
-        self.receiver.recv()
-    }
-
     pub fn try_next(&self) -> Option<AppEvent> {
         match self.receiver.try_recv() {
             Ok(e) => Some(e),

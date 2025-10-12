@@ -1,18 +1,19 @@
 use ansi_to_tui::IntoText;
+use eyre::Result;
 use ratatui::{
     Frame,
     buffer::Buffer,
     layout::{Offset, Rect},
     widgets::Widget,
 };
-use tachyonfx::{BufferRenderer, Duration, Effect, EffectManager, blit_buffer, dsl::EffectDsl};
+use tachyonfx::{Duration, Effect, EffectManager, blit_buffer, dsl::EffectDsl};
 use unicode_segmentation::UnicodeSegmentation;
-use wasm_bindgen::JsValue;
 
-use crate::event::AppEvent;
+use crate::{event::AppEvent, log::log_error};
 
 pub struct App {
     effects: EffectManager<u8>,
+    effect_dsl: Option<String>,
     canvas_buf: Buffer,
     last_tick_instant: web_time::Instant,
     last_tick_duration: Duration,
@@ -26,6 +27,7 @@ impl App {
             canvas_buf: Buffer::empty(area),
             last_tick_instant: web_time::Instant::now(),
             last_tick_duration: Duration::default(),
+            effect_dsl: None,
         }
     }
 
@@ -40,8 +42,16 @@ impl App {
             .process_effects(elapsed, frame.buffer_mut(), area);
     }
 
-    pub fn register_effect(&mut self, effect: Effect) {
+    fn register_effect(&mut self, effect: Effect) {
         self.effects.add_unique_effect(0, effect);
+    }
+
+    fn replay_effect(&mut self) {
+        if let Some(dsl) = &self.effect_dsl {
+            let effect = compile_dsl(dsl).expect("Known good DSL should compile successfully");
+
+            self.register_effect(effect);
+        }
     }
 
     pub fn apply_event(&mut self, event: AppEvent) {
@@ -49,13 +59,9 @@ impl App {
             AppEvent::Tick => (),
             AppEvent::Resize(_w, _h) => {},
             AppEvent::ReplaceCanvas(ansi) => self.update_canvas(ansi),
-            AppEvent::CompileDsl(code) => self.compile_dsl(code),
-            AppEvent::ReplayCurrentEffect => {},
+            AppEvent::CompileDsl(code) => self.compile_and_register_effect(code),
+            AppEvent::ReplayCurrentEffect => self.replay_effect(),
         }
-    }
-
-    fn resize_canvas(&mut self, area: Rect) {
-        self.canvas_buf = Buffer::empty(area);
     }
 
     fn update_canvas(&mut self, source: String) {
@@ -66,31 +72,24 @@ impl App {
             .unwrap_or(0);
 
         let Ok(canvas) = source.into_text() else {
-            web_sys::console::error_1(&JsValue::from_str("Failed to parse ANSI input"));
+            log_error("Failed to parse ANSI input");
             return;
         };
 
         let h = canvas.lines.len();
 
         let area = Rect::new(0, 0, w as u16, h as u16);
-        self.resize_canvas(area);
+        self.canvas_buf = Buffer::empty(area);
         canvas.render(area, &mut self.canvas_buf);
     }
 
-    fn compile_dsl(&mut self, dsl: String) {
-        let effect = EffectDsl::new().compiler().compile(dsl.as_str());
-
-        match effect {
-            Ok(effect) => self.register_effect(effect),
-            Err(e) => {
-                eprintln!("DSL compilation error: {}", e);
-                eprintln!("Context: {}", e.context());
-                eprintln!(
-                    "Position: line {}, column {}",
-                    e.start_line(),
-                    e.start_column()
-                );
+    fn compile_and_register_effect(&mut self, code: String) {
+        match compile_dsl(&code) {
+            Ok(effect) => {
+                self.effect_dsl = Some(code); // in case of replay
+                self.register_effect(effect)
             },
+            Err(e) => log_error(format!("DSL compilation error:\n{}", e)),
         }
     }
 
@@ -111,4 +110,11 @@ fn terminal_cell_width(line: &str) -> usize {
     line.graphemes(true)
         .map(|g| if emojis::get(g).is_some() { 2 } else { 1 })
         .sum()
+}
+
+fn compile_dsl(dsl: &str) -> Result<Effect> {
+    EffectDsl::new()
+        .compiler()
+        .compile(dsl)
+        .map_err(|e| e.into())
 }
