@@ -2,6 +2,11 @@
 name = "tachyonfx-renderer"
 version = "0.1.0"
 edition = "2024"
+description = "WebAssembly terminal effects renderer for the browser"
+license = "MIT"
+repository = "https://github.com/junkdog/tachyonfx-renderer"
+keywords = ["wasm", "terminal", "tui", "ratatui", "effects"]
+categories = ["wasm", "web-programming"]
 
 [lib]
 crate-type = ["cdylib", "rlib"]
@@ -15,7 +20,6 @@ ansi-to-tui = "7.0.0"
 console_error_panic_hook = "0.1"
 emojis = "0.7.2"
 eyre = "0.6.12"
-indoc = "2.0.6"
 ratatui = { version = "0.29.0", default-features = false }
 unicode-segmentation = "1.12.0"
 wasm-bindgen = "0.2.104"
