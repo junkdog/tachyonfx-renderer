@@ -6,7 +6,7 @@ use std::{
         mpsc::Sender,
     },
 };
-
+use ansi_to_tui::IntoText;
 use ratzilla::WebRenderer;
 use wasm_bindgen::prelude::*;
 
@@ -63,7 +63,7 @@ fn remove_instance(id: u32) {
 }
 
 #[wasm_bindgen]
-pub struct TachyonRenderer {
+pub struct TachyonFxRenderer {
     instance_id: u32,
 }
 
@@ -72,7 +72,7 @@ pub fn create_renderer(
     container_id: &str,
     dsl_code: &str,
     canvas_content: &str,
-) -> Result<TachyonRenderer, JsValue> {
+) -> Result<TachyonFxRenderer, JsValue> {
     std::panic::set_hook(Box::new(console_error_panic_hook::hook));
 
     let events = EventHandler::new(core::time::Duration::from_millis(33));
@@ -83,7 +83,7 @@ pub fn create_renderer(
     sender.dispatch(CompileDsl(dsl_code.into()));
 
     // Create terminal for this container
-    let terminal = create_terminal(container_id)
+    let terminal = create_terminal(container_id, calculate_terminal_size(canvas_content)?)
         .map_err(|e| JsValue::from_str(&format!("Failed to create terminal: {}", e)))?;
 
     // Create running flag (starts as true)
@@ -108,11 +108,11 @@ pub fn create_renderer(
     let instance_id = next_instance_id();
     register_instance(instance_id, sender, running);
 
-    Ok(TachyonRenderer { instance_id })
+    Ok(TachyonFxRenderer { instance_id })
 }
 
 #[wasm_bindgen]
-impl TachyonRenderer {
+impl TachyonFxRenderer {
     #[wasm_bindgen(js_name = updateCanvas)]
     pub fn update_canvas(&self, ansi_content: &str) {
         if let Some(sender) = get_sender(self.instance_id) {
@@ -165,4 +165,17 @@ impl TachyonRenderer {
         // Note: Cannot stop the render loop yet - ratzilla doesn't support it
         // The loop will continue but won't render anything since running flag is false
     }
+}
+
+fn calculate_terminal_size(canvas: &str) -> Result<(u16, u16), JsValue> {
+    let text = canvas.into_text()
+        .map_err(|e| JsValue::from_str(&format!("Failed to parse ANSI input: {}", e)))?;
+
+    let rows = text.lines.len();
+    let cols = text.lines.iter()
+        .map(|line| line.width())
+        .max()
+        .unwrap_or(0);
+
+    Ok((cols as u16, rows as u16))
 }

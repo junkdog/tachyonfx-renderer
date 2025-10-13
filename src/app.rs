@@ -65,11 +65,6 @@ impl App {
     }
 
     fn update_canvas(&mut self, source: String) {
-        let w = source
-            .lines()
-            .map(terminal_cell_width)
-            .max()
-            .unwrap_or(0);
 
         let Ok(canvas) = source.into_text() else {
             log_error("Failed to parse ANSI input");
@@ -77,6 +72,10 @@ impl App {
         };
 
         let h = canvas.lines.len();
+        let w = canvas.lines.iter()
+            .map(|line| line.width())
+            .max()
+            .unwrap_or(0);
 
         let area = Rect::new(0, 0, w as u16, h as u16);
         self.canvas_buf = Buffer::empty(area);

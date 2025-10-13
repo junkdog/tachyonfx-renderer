@@ -4,13 +4,13 @@ import { DEFAULT_CANVAS_ANSI, KEY_PRESS_FX_ANSI } from './ansi-content';
 type TachyonModule = typeof import('tachyonfx-renderer');
 
 let createRenderer: TachyonModule['createRenderer'];
-let TachyonRenderer: TachyonModule['TachyonRenderer'];
+let TachyonRenderer: TachyonModule['TachyonFxRenderer'];
 
 async function initWasm() {
   const module = await import('tachyonfx-renderer');
   await module.default();
   createRenderer = module.createRenderer;
-  TachyonRenderer = module.TachyonRenderer;
+  TachyonRenderer = module.TachyonFxRenderer;
 }
 
 // DSL effect examples
