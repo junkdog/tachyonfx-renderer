@@ -11,10 +11,6 @@ categories = ["wasm", "web-programming"]
 [lib]
 crate-type = ["cdylib", "rlib"]
 
-[[bin]]
-name = "tachyonfx-renderer"
-path = "src/main.rs"
-
 [dependencies]
 ansi-to-tui = "7.0.0"
 console_error_panic_hook = "0.1"

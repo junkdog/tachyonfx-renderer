@@ -19,10 +19,7 @@ impl EventHandler {
     }
 
     pub fn try_next(&self) -> Option<AppEvent> {
-        match self.receiver.try_recv() {
-            Ok(e) => Some(e),
-            Err(_) => None,
-        }
+        self.receiver.try_recv().ok()
     }
 
     pub fn iter(&self) -> EventIter<'_> {

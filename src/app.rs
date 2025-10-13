@@ -7,7 +7,6 @@ use ratatui::{
     widgets::Widget,
 };
 use tachyonfx::{Duration, Effect, EffectManager, blit_buffer, dsl::EffectDsl};
-use unicode_segmentation::UnicodeSegmentation;
 
 use crate::{event::AppEvent, log::log_error};
 
@@ -35,7 +34,7 @@ impl App {
         let elapsed = self.tick();
 
         // copy canvas to frame buffer
-        blit_buffer(&self.canvas_buf, &mut frame.buffer_mut(), Offset::default());
+        blit_buffer(&self.canvas_buf, frame.buffer_mut(), Offset::default());
 
         let area = frame.area();
         self.effects
@@ -56,8 +55,6 @@ impl App {
 
     pub fn apply_event(&mut self, event: AppEvent) {
         match event {
-            AppEvent::Tick => (),
-            AppEvent::Resize(_w, _h) => {},
             AppEvent::ReplaceCanvas(ansi) => self.update_canvas(ansi),
             AppEvent::CompileDsl(code) => self.compile_and_register_effect(code),
             AppEvent::ReplayCurrentEffect => self.replay_effect(),
@@ -104,12 +101,6 @@ impl App {
 
         self.last_tick_duration
     }
-}
-
-fn terminal_cell_width(line: &str) -> usize {
-    line.graphemes(true)
-        .map(|g| if emojis::get(g).is_some() { 2 } else { 1 })
-        .sum()
 }
 
 fn compile_dsl(dsl: &str) -> Result<Effect> {
