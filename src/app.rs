@@ -65,14 +65,15 @@ impl App {
     }
 
     fn update_canvas(&mut self, source: String) {
-
         let Ok(canvas) = source.into_text() else {
             log_error("Failed to parse ANSI input");
             return;
         };
 
         let h = canvas.lines.len();
-        let w = canvas.lines.iter()
+        let w = canvas
+            .lines
+            .iter()
             .map(|line| line.width())
             .max()
             .unwrap_or(0);

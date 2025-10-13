@@ -215,15 +215,12 @@
       <div class="canvas-container">
         <div class="canvas-header">
           <span class="canvas-title">Canvas 1: Showcase</span>
-          <span id="status1" class="status running">🟢 Running</span>
         </div>
         <div class="canvas-wrapper">
           <div id="canvas1"></div>
         </div>
         <div class="controls">
-          <button id="btn-canvas1-stop" class="danger">Stop</button>
-          <button id="btn-canvas1-start" class="success">Start</button>
-          <button id="btn-canvas1-replay" class="primary">Replay Effect</button>
+          <button id="btn-canvas1-replay" class="primary">Play Effect</button>
           <button id="btn-canvas1-effect-fade">Fade Effect</button>
           <button id="btn-canvas1-effect-complex">Complex Effect</button>
         </div>
@@ -233,16 +230,12 @@
       <div class="canvas-container">
         <div class="canvas-header">
           <span class="canvas-title">Canvas 2: Timeline</span>
-          <span id="status2" class="status running">🟢 Running</span>
         </div>
         <div class="canvas-wrapper">
           <div id="canvas2"></div>
         </div>
         <div class="controls">
-          <button id="btn-canvas2-stop" class="danger">Stop</button>
-          <button id="btn-canvas2-start" class="success">Start</button>
-          <button id="btn-canvas2-replay" class="primary">Replay Effect</button>
-          <button id="btn-canvas2-swap">Swap Content</button>
+          <button id="btn-canvas2-replay" class="primary">Play Effect</button>
         </div>
       </div>
     </div>
@@ -251,8 +244,6 @@
     <div class="global-controls">
       <h2>Global Controls</h2>
       <div class="controls">
-        <button id="btn-stop-all" class="danger">Stop All</button>
-        <button id="btn-start-all" class="success">Start All</button>
         <button id="btn-destroy-all" class="danger">Destroy All</button>
       </div>
     </div>
@@ -261,18 +252,14 @@
     <div class="info">
       <h3>API Demonstration</h3>
       <p>
-        This example demonstrates the full TachyonFX Renderer API using two independent canvas instances.
+        This example demonstrates the TachyonFX Renderer API using two independent canvas instances.
         Each renderer loads different ANSI content and applies different effects from the DSL.
       </p>
       <p style="margin-top: 10px;">
         <strong>Available Methods:</strong>
-        <code>createRenderer()</code>,
-        <code>updateCanvas()</code>,
-        <code>updateEffect()</code>,
-        <code>replayEffect()</code>,
-        <code>start()</code>,
-        <code>stop()</code>,
-        <code>isRunning()</code>,
+        <code>createRenderer(container_id, dsl_code, canvas_content)</code>,
+        <code>updateEffect(dsl_code)</code>,
+        <code>playEffect()</code>,
         <code>destroy()</code>
       </p>
     </div>

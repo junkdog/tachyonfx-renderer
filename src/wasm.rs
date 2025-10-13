@@ -6,6 +6,7 @@ use std::{
         mpsc::Sender,
     },
 };
+
 use ansi_to_tui::IntoText;
 use ratzilla::WebRenderer;
 use wasm_bindgen::prelude::*;
@@ -113,13 +114,6 @@ pub fn create_renderer(
 
 #[wasm_bindgen]
 impl TachyonFxRenderer {
-    #[wasm_bindgen(js_name = updateCanvas)]
-    pub fn update_canvas(&self, ansi_content: &str) {
-        if let Some(sender) = get_sender(self.instance_id) {
-            sender.dispatch(ReplaceCanvas(ansi_content.into()));
-        }
-    }
-
     #[wasm_bindgen(js_name = updateEffect)]
     pub fn update_effect(&self, dsl_code: &str) {
         if let Some(sender) = get_sender(self.instance_id) {
@@ -127,30 +121,11 @@ impl TachyonFxRenderer {
         }
     }
 
-    #[wasm_bindgen(js_name = replayEffect)]
-    pub fn replay_effect(&self) {
+    #[wasm_bindgen(js_name = playEffect)]
+    pub fn play_effect(&self) {
         if let Some(sender) = get_sender(self.instance_id) {
             sender.dispatch(ReplayCurrentEffect);
         }
-    }
-
-    pub fn start(&self) {
-        if let Some(running) = get_running_flag(self.instance_id) {
-            running.store(true, Ordering::Relaxed);
-        }
-    }
-
-    pub fn stop(&self) {
-        if let Some(running) = get_running_flag(self.instance_id) {
-            running.store(false, Ordering::Relaxed);
-        }
-    }
-
-    #[wasm_bindgen(js_name = isRunning)]
-    pub fn is_running(&self) -> bool {
-        get_running_flag(self.instance_id)
-            .map(|running| running.load(Ordering::Relaxed))
-            .unwrap_or(false)
     }
 
     pub fn destroy(self) {
@@ -168,11 +143,14 @@ impl TachyonFxRenderer {
 }
 
 fn calculate_terminal_size(canvas: &str) -> Result<(u16, u16), JsValue> {
-    let text = canvas.into_text()
+    let text = canvas
+        .into_text()
         .map_err(|e| JsValue::from_str(&format!("Failed to parse ANSI input: {}", e)))?;
 
     let rows = text.lines.len();
-    let cols = text.lines.iter()
+    let cols = text
+        .lines
+        .iter()
         .map(|line| line.width())
         .max()
         .unwrap_or(0);

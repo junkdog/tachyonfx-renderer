@@ -36,35 +36,22 @@ const COMPLEX_EFFECT = `
 class RendererDemo {
   private renderer1: any = null;
   private renderer2: any = null;
-  private canvas1Content: string = DEFAULT_CANVAS_ANSI;
-  private canvas2Content: string = KEY_PRESS_FX_ANSI;
 
   async initialize() {
     // Initialize WASM module
     await initWasm();
 
     // Create both renderers
-    this.renderer1 = createRenderer('canvas1', SLIDE_IN_EFFECT, this.canvas1Content);
-    this.renderer2 = createRenderer('canvas2', SWEEP_EFFECT, this.canvas2Content);
+    this.renderer1 = createRenderer('canvas1', SLIDE_IN_EFFECT, DEFAULT_CANVAS_ANSI);
+    this.renderer2 = createRenderer('canvas2', SWEEP_EFFECT, KEY_PRESS_FX_ANSI);
 
     this.setupControls();
-    this.logStatus();
   }
 
   private setupControls() {
     // Canvas 1 controls
-    this.setupButton('btn-canvas1-stop', () => {
-      this.renderer1?.stop();
-      this.logStatus();
-    });
-
-    this.setupButton('btn-canvas1-start', () => {
-      this.renderer1?.start();
-      this.logStatus();
-    });
-
     this.setupButton('btn-canvas1-replay', () => {
-      this.renderer1?.replayEffect();
+      this.renderer1?.playEffect();
     });
 
     this.setupButton('btn-canvas1-effect-fade', () => {
@@ -76,48 +63,16 @@ class RendererDemo {
     });
 
     // Canvas 2 controls
-    this.setupButton('btn-canvas2-stop', () => {
-      this.renderer2?.stop();
-      this.logStatus();
-    });
-
-    this.setupButton('btn-canvas2-start', () => {
-      this.renderer2?.start();
-      this.logStatus();
-    });
-
     this.setupButton('btn-canvas2-replay', () => {
-      this.renderer2?.replayEffect();
-    });
-
-    this.setupButton('btn-canvas2-swap', () => {
-      // Swap content between canvases
-      const temp = this.canvas1Content;
-      this.canvas1Content = this.canvas2Content;
-      this.canvas2Content = temp;
-
-      this.renderer2?.updateCanvas(this.canvas2Content);
+      this.renderer2?.playEffect();
     });
 
     // Global controls
-    this.setupButton('btn-stop-all', () => {
-      this.renderer1?.stop();
-      this.renderer2?.stop();
-      this.logStatus();
-    });
-
-    this.setupButton('btn-start-all', () => {
-      this.renderer1?.start();
-      this.renderer2?.start();
-      this.logStatus();
-    });
-
     this.setupButton('btn-destroy-all', () => {
       this.renderer1?.destroy();
       this.renderer2?.destroy();
       this.renderer1 = null;
       this.renderer2 = null;
-      this.logStatus();
       this.disableAllButtons();
     });
   }
@@ -126,33 +81,6 @@ class RendererDemo {
     const button = document.getElementById(id);
     if (button) {
       button.addEventListener('click', callback);
-    }
-  }
-
-  private logStatus() {
-    const status1 = this.renderer1?.isRunning() ?? false;
-    const status2 = this.renderer2?.isRunning() ?? false;
-
-    console.log('Renderer Status:', {
-      canvas1: status1 ? 'running' : 'stopped',
-      canvas2: status2 ? 'running' : 'stopped',
-    });
-
-    this.updateStatusDisplay(status1, status2);
-  }
-
-  private updateStatusDisplay(status1: boolean, status2: boolean) {
-    const statusEl1 = document.getElementById('status1');
-    const statusEl2 = document.getElementById('status2');
-
-    if (statusEl1) {
-      statusEl1.textContent = status1 ? '🟢 Running' : '🔴 Stopped';
-      statusEl1.className = status1 ? 'status running' : 'status stopped';
-    }
-
-    if (statusEl2) {
-      statusEl2.textContent = status2 ? '🟢 Running' : '🔴 Stopped';
-      statusEl2.className = status2 ? 'status running' : 'status stopped';
     }
   }
 
