@@ -25,7 +25,7 @@ pub fn create_terminal(
 fn calculate_canvas_size(terminal_size: (u16, u16)) -> (u32, u32) {
     let (w, h) = FontAtlasData::default().cell_size;
     (
-        terminal_size.0 as u32 * w as u32 - 2,
-        terminal_size.1 as u32 * h as u32 - 2,
+        terminal_size.0 as u32 * (w as u32 - 2),
+        terminal_size.1 as u32 * (h as u32 - 2),
     )
 }
