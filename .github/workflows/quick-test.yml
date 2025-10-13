@@ -1,0 +1,62 @@
+name: ⚡ Quick Test
+
+on:
+  push:
+    branches-ignore:
+      - main
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
+jobs:
+  quick-check:
+    name: ⚡ Quick Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rustfmt
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+          targets: wasm32-unknown-unknown
+
+      - uses: Swatinem/rust-cache@v2
+
+      # Quick format check
+      - name: 🎨 Check formatting
+        run: cargo +nightly fmt --all -- --check
+
+      # Run clippy
+      - name: 📎 Clippy check
+        run: cargo clippy --all-targets --all-features -- -D warnings
+
+      # Basic build check for WASM
+      - name: 🕸️ Check WASM build
+        run: cargo check --target wasm32-unknown-unknown
+
+  trigger-full-ci:
+    name: 🚀 Trigger Full CI
+    needs: quick-check
+    runs-on: ubuntu-latest
+    if: success()
+    steps:
+      - name: Trigger CI workflow
+        uses: actions/github-script@v8
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'ci.yml',
+              ref: context.ref,
+              inputs: {
+                triggered_by: 'quick-test'
+              }
+            });
+            console.log('Triggered full CI workflow');
