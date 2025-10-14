@@ -198,6 +198,38 @@
       color: #8ec07c;
       font-family: 'Courier New', monospace;
     }
+
+    .code-snippet {
+      background: #282828;
+      border: 1px solid #3c3836;
+      border-radius: 4px;
+      padding: 12px;
+      margin-top: 15px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.85rem;
+      overflow-x: auto;
+    }
+
+    .code-snippet .comment {
+      color: #928374;
+      font-style: italic;
+    }
+
+    .code-snippet .keyword {
+      color: #fb4934;
+    }
+
+    .code-snippet .function {
+      color: #8ec07c;
+    }
+
+    .code-snippet .string {
+      color: #b8bb26;
+    }
+
+    .code-snippet .variable {
+      color: #83a598;
+    }
   </style>
 </head>
 <body>
@@ -219,6 +251,26 @@
           <button id="btn-canvas1-effect-fade">Fade Effect</button>
           <button id="btn-canvas1-effect-complex">Complex Effect</button>
         </div>
+        <div class="code-snippet">
+          <span class="comment">// Create the renderer</span><br>
+          <span class="keyword">const</span> <span class="variable">renderer1</span> = <span class="function">createRenderer</span>(<br>
+          &nbsp;&nbsp;<span class="string">'canvas1'</span>,<br>
+          &nbsp;&nbsp;<span class="string">'fx::slide_in(Motion::RightToLeft, 10, 0, Color::Black, (800, Interpolation::QuadOut))'</span>,<br>
+          &nbsp;&nbsp;<span class="variable">ansiContent</span><br>
+          );<br>
+          <br>
+          <span class="comment">// Update to fade effect</span><br>
+          <span class="variable">renderer1</span>.<span class="function">updateEffect</span>(<span class="string">'fx::fade_from_fg(Color::Black, (600, Interpolation::CubicOut))'</span>);<br>
+          <br>
+          <span class="comment">// Update to complex parallel effect</span><br>
+          <span class="variable">renderer1</span>.<span class="function">updateEffect</span>(<span class="string">`fx::parallel(&[<br>
+          &nbsp;&nbsp;fx::sweep_in(Motion::RightToLeft, 15, 0, Color::Black, (1000, Interpolation::BounceOut)),<br>
+          &nbsp;&nbsp;fx::coalesce((1000, Interpolation::QuadOut))<br>
+          ])`</span>);<br>
+          <br>
+          <span class="comment">// Replay current effect</span><br>
+          <span class="variable">renderer1</span>.<span class="function">playEffect</span>();
+        </div>
       </div>
 
       <!-- Canvas 2 -->
@@ -231,6 +283,17 @@
         </div>
         <div class="controls">
           <button id="btn-canvas2-replay" class="primary">Play Effect</button>
+        </div>
+        <div class="code-snippet">
+          <span class="comment">// Create the renderer</span><br>
+          <span class="keyword">const</span> <span class="variable">renderer2</span> = <span class="function">createRenderer</span>(<br>
+          &nbsp;&nbsp;<span class="string">'canvas2'</span>,<br>
+          &nbsp;&nbsp;<span class="string">'fx::sweep_in(Motion::LeftToRight, 10, 0, Color::Black, (1200, Interpolation::QuadOut))'</span>,<br>
+          &nbsp;&nbsp;<span class="variable">ansiContent</span><br>
+          );<br>
+          <br>
+          <span class="comment">// Replay current effect</span><br>
+          <span class="variable">renderer2</span>.<span class="function">playEffect</span>();
         </div>
       </div>
     </div>
