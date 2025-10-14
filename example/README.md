@@ -1,5 +1,7 @@
 # TachyonFX Renderer - TypeScript/Webpack Example
 
+[![NPM Badge]][NPM]
+
 This example demonstrates how to use the TachyonFX Renderer WebAssembly library in a TypeScript application with webpack.
 
 ## Quick Start
@@ -104,3 +106,6 @@ fx: [
 ]
 `;
 ```
+
+ [npm]: https://www.npmjs.com/package/tachyon-fxrenderer
+ [NPM Badge]: https://img.shields.io/npm/v/tachyonfx-renderer.svg
