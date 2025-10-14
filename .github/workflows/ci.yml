@@ -127,3 +127,31 @@ jobs:
         with:
           name: docs
           path: target/doc/
+
+  # Deploy to GitHub Pages
+  deploy:
+    name: 🚀 Deploy to GitHub Pages
+    runs-on: ubuntu-latest
+    needs: build-example
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: 📥 Download example artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: example-build
+          path: ./dist
+
+      - name: 📦 Upload artifact for Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
+
+      - name: 🚀 Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
