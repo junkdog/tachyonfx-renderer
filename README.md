@@ -1,5 +1,7 @@
 # TachyonFX Renderer
 
+[![NPM Badge]][NPM]
+
 WebAssembly library for rendering [tachyonfx](https://github.com/junkdog/tachyonfx) effects in the browser. Replaces
 animated GIFs in documentation with live, interactive terminal effect demos.
 
@@ -112,3 +114,6 @@ wasm-pack build --target web --out-dir pkg
 ## License
 
 MIT
+
+[npm]: https://www.npmjs.com/package/tachyon-fxrenderer
+[NPM Badge]: https://img.shields.io/npm/v/tachyonfx-renderer.svg
