@@ -3,6 +3,8 @@
 WebAssembly library for rendering [tachyonfx](https://github.com/junkdog/tachyonfx) effects in the browser. Replaces
 animated GIFs in documentation with live, interactive terminal effect demos.
 
+**[🚀 Live Demo](https://junkdog.github.io/tachyonfx-renderer/)**
+
 ## Installation
 
 ```bash
