@@ -199,6 +199,31 @@
       font-family: 'Courier New', monospace;
     }
 
+    .banner {
+      position: sticky;
+      top: 0;
+      background: #1d2021;
+      border-bottom: 2px solid #3c3836;
+      text-align: center;
+      padding: 12px 20px;
+      margin-bottom: 20px;
+      color: #a89984;
+      z-index: 1000;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    }
+
+    .banner a {
+      color: #fe8019;
+      text-decoration: none;
+      font-weight: 600;
+      margin: 0 8px;
+    }
+
+    .banner a:hover {
+      color: #fabd2f;
+      text-decoration: underline;
+    }
+
     .code-snippet {
       background: #282828;
       border: 1px solid #3c3836;
@@ -233,6 +258,21 @@
   </style>
 </head>
 <body>
+  <!-- Banner -->
+  <div class="banner">
+    <a href="https://github.com/junkdog/tachyonfx-renderer" target="_blank" rel="noopener noreferrer">
+      View on GitHub
+    </a>
+    •
+    <a href="https://github.com/junkdog/tachyonfx" target="_blank" rel="noopener noreferrer">
+      tachyonfx
+    </a>
+    •
+    <a href="https://www.npmjs.com/package/tachyonfx-renderer" target="_blank" rel="noopener noreferrer">
+      npm
+    </a>
+  </div>
+
   <div class="container">
     <h1>🌊 TachyonFX Renderer</h1>
     <p class="subtitle">WebAssembly Terminal Effects in the Browser</p>
