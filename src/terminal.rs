@@ -12,9 +12,7 @@ pub fn create_terminal(
     let backend = WebGl2Backend::new_with_options(
         WebGl2BackendOptions::new()
             .size(calculate_canvas_size(terminal_size))
-            .enable_mouse_selection()
-            .grid_id(container_id)
-            .measure_performance(true),
+            .grid_id(container_id),
     )
     .map_err(|e| eyre::eyre!("{:?}", e))?;
 

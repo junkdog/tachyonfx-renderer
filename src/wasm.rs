@@ -124,7 +124,7 @@ impl TachyonFxRenderer {
     #[wasm_bindgen(js_name = playEffect)]
     pub fn play_effect(&self) {
         if let Some(sender) = get_sender(self.instance_id) {
-            sender.dispatch(ReplayCurrentEffect);
+            sender.dispatch(RestartEffect);
         }
     }
 

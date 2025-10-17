@@ -7,8 +7,8 @@ use ratatui::{
     widgets::Widget,
 };
 use tachyonfx::{Duration, Effect, EffectManager, blit_buffer, dsl::EffectDsl};
-
-use crate::{event::AppEvent, log::log_error};
+use wasm_bindgen::JsValue;
+use crate::event::AppEvent;
 
 pub struct App {
     effects: EffectManager<u8>,
@@ -16,6 +16,7 @@ pub struct App {
     canvas_buf: Buffer,
     last_tick_instant: web_time::Instant,
     last_tick_duration: Duration,
+    sleep_between_replay: Duration,
 }
 
 impl App {
@@ -26,6 +27,7 @@ impl App {
             canvas_buf: Buffer::empty(area),
             last_tick_instant: web_time::Instant::now(),
             last_tick_duration: Duration::default(),
+            sleep_between_replay: Duration::default(),
             effect_dsl: None,
         }
     }
@@ -57,7 +59,7 @@ impl App {
         match event {
             AppEvent::ReplaceCanvas(ansi) => self.update_canvas(ansi),
             AppEvent::CompileDsl(code) => self.compile_and_register_effect(code),
-            AppEvent::ReplayCurrentEffect => self.replay_effect(),
+            AppEvent::RestartEffect => self.replay_effect(),
         }
     }
 
@@ -108,4 +110,9 @@ fn compile_dsl(dsl: &str) -> Result<Effect> {
         .compiler()
         .compile(dsl)
         .map_err(|e| e.into())
+}
+
+fn log_error(msg: impl Into<String>) {
+    let msg = msg.into();
+    web_sys::console::error_1(&JsValue::from_str(&msg));
 }
