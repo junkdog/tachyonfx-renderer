@@ -9,6 +9,7 @@ use std::{
 
 use ansi_to_tui::IntoText;
 use ratzilla::WebRenderer;
+use tachyonfx::Duration;
 use wasm_bindgen::prelude::*;
 
 use crate::{
@@ -92,7 +93,8 @@ pub fn create_renderer(
     let running_clone = running.clone();
 
     // Start render loop with state check
-    let mut app = App::new();
+    let mut app = App::new().sleep_between_replay(Duration::from_millis(2000));
+
     terminal.draw_web(move |frame| {
         // Only render if instance is running
         if !running_clone.load(Ordering::Relaxed) {

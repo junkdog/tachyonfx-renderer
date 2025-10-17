@@ -6,8 +6,9 @@ use ratatui::{
     layout::{Offset, Rect},
     widgets::Widget,
 };
-use tachyonfx::{Duration, Effect, EffectManager, blit_buffer, dsl::EffectDsl};
+use tachyonfx::{Duration, Effect, EffectManager, blit_buffer, dsl::EffectDsl, fx};
 use wasm_bindgen::JsValue;
+
 use crate::event::AppEvent;
 
 pub struct App {
@@ -27,9 +28,14 @@ impl App {
             canvas_buf: Buffer::empty(area),
             last_tick_instant: web_time::Instant::now(),
             last_tick_duration: Duration::default(),
-            sleep_between_replay: Duration::default(),
             effect_dsl: None,
+            sleep_between_replay: Duration::from_millis(5000),
         }
+    }
+
+    pub fn sleep_between_replay(mut self, duration: Duration) -> Self {
+        self.sleep_between_replay = duration;
+        self
     }
 
     pub fn render(&mut self, frame: &mut Frame) {
@@ -44,7 +50,10 @@ impl App {
     }
 
     fn register_effect(&mut self, effect: Effect) {
-        self.effects.add_unique_effect(0, effect);
+        let effect_with_sleep = fx::sequence(&[effect, fx::sleep(self.sleep_between_replay)]);
+
+        self.effects
+            .add_unique_effect(0, fx::repeating(effect_with_sleep));
     }
 
     fn replay_effect(&mut self) {
