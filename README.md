@@ -27,9 +27,9 @@ const config = new RendererConfig('container-id')
 
 const renderer = createRenderer(config);
 
-// Update effect and replay
+// Update effect and restart
 renderer.updateEffect('fx::fade_in((600, Interpolation::CubicOut))');
-renderer.playEffect();
+renderer.restartEffect();
 
 // Cleanup
 renderer.destroy();
@@ -61,7 +61,7 @@ Returns a `TachyonFxRenderer` handle.
 ### `TachyonFxRenderer` methods
 
 - `updateEffect(dslCode)` - Change and apply a new effect
-- `playEffect()` - Replay the current effect
+- `restartEffect()` - Restart the current effect from the beginning
 - `destroy()` - Stop rendering and cleanup resources
 
 
@@ -81,7 +81,7 @@ const config2 = new RendererConfig('terminal-2')
 const renderer2 = createRenderer(config2);
 
 renderer1.updateEffect(newDsl);
-renderer2.playEffect();
+renderer2.restartEffect();
 ```
 
 ## Example

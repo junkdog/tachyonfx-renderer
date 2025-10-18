@@ -61,7 +61,7 @@ class RendererDemo {
   private setupControls() {
     // Canvas 1 controls
     this.setupButton('btn-canvas1-replay', () => {
-      this.renderer1?.playEffect();
+      this.renderer1?.restartEffect();
     });
 
     this.setupButton('btn-canvas1-effect-fade', () => {
@@ -74,7 +74,7 @@ class RendererDemo {
 
     // Canvas 2 controls
     this.setupButton('btn-canvas2-replay', () => {
-      this.renderer2?.playEffect();
+      this.renderer2?.restartEffect();
     });
 
     // Global controls

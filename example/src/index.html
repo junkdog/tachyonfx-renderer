@@ -287,7 +287,7 @@
           <div id="canvas1"></div>
         </div>
         <div class="controls">
-          <button id="btn-canvas1-replay" class="primary">Play Effect</button>
+          <button id="btn-canvas1-replay" class="primary">Restart Effect</button>
           <button id="btn-canvas1-effect-fade">Fade Effect</button>
           <button id="btn-canvas1-effect-complex">Complex Effect</button>
         </div>
@@ -308,8 +308,8 @@
           &nbsp;&nbsp;fx::coalesce((1000, Interpolation::QuadOut))<br>
           ])`</span>);<br>
           <br>
-          <span class="comment">// Replay current effect</span><br>
-          <span class="variable">renderer1</span>.<span class="function">playEffect</span>();
+          <span class="comment">// Restart current effect</span><br>
+          <span class="variable">renderer1</span>.<span class="function">restartEffect</span>();
         </div>
       </div>
 
@@ -322,7 +322,7 @@
           <div id="canvas2"></div>
         </div>
         <div class="controls">
-          <button id="btn-canvas2-replay" class="primary">Play Effect</button>
+          <button id="btn-canvas2-replay" class="primary">Restart Effect</button>
         </div>
         <div class="code-snippet">
           <span class="comment">// Create the renderer with config</span><br>
@@ -331,8 +331,8 @@
           &nbsp;&nbsp;.<span class="function">withCanvas</span>(<span class="variable">ansiContent</span>);<br>
           <span class="keyword">const</span> <span class="variable">renderer2</span> = <span class="function">createRenderer</span>(<span class="variable">config2</span>);<br>
           <br>
-          <span class="comment">// Replay current effect</span><br>
-          <span class="variable">renderer2</span>.<span class="function">playEffect</span>();
+          <span class="comment">// Restart current effect</span><br>
+          <span class="variable">renderer2</span>.<span class="function">restartEffect</span>();
         </div>
       </div>
     </div>
@@ -360,7 +360,7 @@
         <code>.withSleepBetweenReplay(ms)</code>,
         <code>createRenderer(config)</code>,
         <code>updateEffect(dsl_code)</code>,
-        <code>playEffect()</code>,
+        <code>restartEffect()</code>,
         <code>destroy()</code>
       </p>
     </div>
