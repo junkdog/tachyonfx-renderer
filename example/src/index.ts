@@ -4,12 +4,14 @@ import { DEFAULT_CANVAS_ANSI, KEY_PRESS_FX_ANSI } from './ansi-content';
 type TachyonModule = typeof import('tachyonfx-renderer');
 
 let createRenderer: TachyonModule['createRenderer'];
+let RendererConfig: TachyonModule['RendererConfig'];
 let TachyonRenderer: TachyonModule['TachyonFxRenderer'];
 
 async function initWasm() {
   const module = await import('tachyonfx-renderer');
   await module.default();
   createRenderer = module.createRenderer;
+  RendererConfig = module.RendererConfig;
   TachyonRenderer = module.TachyonFxRenderer;
 }
 
@@ -41,9 +43,17 @@ class RendererDemo {
     // Initialize WASM module
     await initWasm();
 
-    // Create both renderers
-    this.renderer1 = createRenderer('canvas1', SLIDE_IN_EFFECT, DEFAULT_CANVAS_ANSI);
-    this.renderer2 = createRenderer('canvas2', SWEEP_EFFECT, KEY_PRESS_FX_ANSI);
+    // Create both renderers using config-based API
+    const config1 = new RendererConfig('canvas1')
+      .withDsl(SLIDE_IN_EFFECT)
+      .withCanvas(DEFAULT_CANVAS_ANSI)
+      .withSleepBetweenReplay(1500);
+    this.renderer1 = createRenderer(config1);
+
+    const config2 = new RendererConfig('canvas2')
+      .withDsl(SWEEP_EFFECT)
+      .withCanvas(KEY_PRESS_FX_ANSI);
+    this.renderer2 = createRenderer(config2);
 
     this.setupControls();
   }

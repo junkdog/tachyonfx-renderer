@@ -17,7 +17,7 @@ pub struct App {
     canvas_buf: Buffer,
     last_tick_instant: web_time::Instant,
     last_tick_duration: Duration,
-    sleep_between_replay: Duration,
+    sleep_between_replay: Option<Duration>,
 }
 
 impl App {
@@ -29,12 +29,12 @@ impl App {
             last_tick_instant: web_time::Instant::now(),
             last_tick_duration: Duration::default(),
             effect_dsl: None,
-            sleep_between_replay: Duration::from_millis(5000),
+            sleep_between_replay: None,
         }
     }
 
     pub fn sleep_between_replay(mut self, duration: Duration) -> Self {
-        self.sleep_between_replay = duration;
+        self.sleep_between_replay = Some(duration);
         self
     }
 
@@ -50,13 +50,16 @@ impl App {
     }
 
     fn register_effect(&mut self, effect: Effect) {
-        let effect_with_sleep = fx::sequence(&[effect, fx::sleep(self.sleep_between_replay)]);
-
-        self.effects
-            .add_unique_effect(0, fx::repeating(effect_with_sleep));
+        if let Some(sleep) = self.sleep_between_replay {
+            let effect_with_sleep = fx::sequence(&[effect, fx::sleep(sleep)]);
+            self.effects
+                .add_unique_effect(0, fx::repeating(effect_with_sleep));
+        } else {
+            self.effects.add_unique_effect(0, effect);
+        }
     }
 
-    fn replay_effect(&mut self) {
+    fn restart_effect(&mut self) {
         if let Some(dsl) = &self.effect_dsl {
             let effect = compile_dsl(dsl).expect("Known good DSL should compile successfully");
 
@@ -68,7 +71,7 @@ impl App {
         match event {
             AppEvent::ReplaceCanvas(ansi) => self.update_canvas(ansi),
             AppEvent::CompileDsl(code) => self.compile_and_register_effect(code),
-            AppEvent::RestartEffect => self.replay_effect(),
+            AppEvent::RestartEffect => self.restart_effect(),
         }
     }
 

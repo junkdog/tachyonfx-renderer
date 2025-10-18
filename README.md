@@ -16,15 +16,16 @@ npm install tachyonfx-renderer
 ## Usage
 
 ```typescript
-import init, { createRenderer } from 'tachyonfx-renderer';
+import init, { createRenderer, RendererConfig } from 'tachyonfx-renderer';
 
 await init();
 
-const renderer = createRenderer(
-  'container-id',
-  'fx::slide_in(Motion::RightToLeft, 10, 0, Color::Black, (800, Interpolation::QuadOut))',
-  '\x1b[32mHello, Terminal Effects!\x1b[0m'
-);
+const config = new RendererConfig('container-id')
+  .withDsl('fx::slide_in(Motion::RightToLeft, 10, 0, Color::Black, (800, Interpolation::QuadOut))')
+  .withCanvas('\x1b[32mHello, Terminal Effects!\x1b[0m')
+  .withSleepBetweenReplay(1500);  // Optional: 1.5s between automatic replays
+
+const renderer = createRenderer(config);
 
 // Update effect and replay
 renderer.updateEffect('fx::fade_in((600, Interpolation::CubicOut))');
@@ -36,16 +37,24 @@ renderer.destroy();
 
 ## API
 
-### `createRenderer(containerId, dslCode, ansiContent)`
+### `RendererConfig`
 
-Creates a renderer instance.
+Builder for renderer configuration.
 
-- `containerId`: DOM element ID for the canvas
-- `dslCode`: Effect DSL (see [tachyonfx DSL docs][tfx-dsl] and [fx docs][fx-docs])
-- `ansiContent`: ANSI-formatted text
+#### Constructor
+- `new RendererConfig(containerId)` - Create config with container DOM element ID
+
+#### Builder Methods
+- `withDsl(dslCode)` - Set effect DSL (see [tachyonfx DSL docs][tfx-dsl] and [fx docs][fx-docs])
+- `withCanvas(ansiContent)` - Set ANSI-formatted text content
+- `withSleepBetweenReplay(sleepMs)` - Optional: Set milliseconds between automatic effect replays
 
  [tfx-dsl]: https://github.com/junkdog/tachyonfx/blob/development/docs/dsl.md
  [fx-docs]: https://docs.rs/tachyonfx/latest/tachyonfx/fx/index.html
+
+### `createRenderer(config)`
+
+Creates a renderer instance from configuration.
 
 Returns a `TachyonFxRenderer` handle.
 
@@ -55,36 +64,21 @@ Returns a `TachyonFxRenderer` handle.
 - `playEffect()` - Replay the current effect
 - `destroy()` - Stop rendering and cleanup resources
 
-## Effect Examples
-
-```typescript
-// Slide in from right to left
-'fx::slide_in(Motion::RightToLeft, 10, 0, Color::Black, (800, Interpolation::QuadOut))'
-
-// Fade in from color
-'fx::fade_from_fg(Color::Black, (600, Interpolation::CubicOut))'
-
-// Parallel effects
-`fx::parallel(&[
-  fx::sweep_in(Motion::RightToLeft, 15, 0, Color::Black, (1000, Interpolation::BounceOut)),
-  fx::coalesce((1000, Interpolation::QuadOut))
-])`
-
-// Sequential effects
-`fx::sequence(&[
-  fx::fade_to_fg(Color::Black, (300, Interpolation::Linear)),
-  fx::sleep(200),
-  fx::fade_from_fg(Color::Black, (300, Interpolation::Linear))
-])`
-```
 
 ## Multiple Instances
 
 Multiple renderers can run independently on the same page:
 
 ```typescript
-const renderer1 = createRenderer('terminal-1', dsl1, content1);
-const renderer2 = createRenderer('terminal-2', dsl2, content2);
+const config1 = new RendererConfig('terminal-1')
+  .withDsl(dsl1)
+  .withCanvas(content1);
+const renderer1 = createRenderer(config1);
+
+const config2 = new RendererConfig('terminal-2')
+  .withDsl(dsl2)
+  .withCanvas(content2);
+const renderer2 = createRenderer(config2);
 
 renderer1.updateEffect(newDsl);
 renderer2.playEffect();

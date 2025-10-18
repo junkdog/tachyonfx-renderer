@@ -292,12 +292,12 @@
           <button id="btn-canvas1-effect-complex">Complex Effect</button>
         </div>
         <div class="code-snippet">
-          <span class="comment">// Create the renderer</span><br>
-          <span class="keyword">const</span> <span class="variable">renderer1</span> = <span class="function">createRenderer</span>(<br>
-          &nbsp;&nbsp;<span class="string">'canvas1'</span>,<br>
-          &nbsp;&nbsp;<span class="string">'fx::slide_in(Motion::RightToLeft, 10, 0, Color::Black, (800, Interpolation::QuadOut))'</span>,<br>
-          &nbsp;&nbsp;<span class="variable">ansiContent</span><br>
-          );<br>
+          <span class="comment">// Create the renderer with config</span><br>
+          <span class="keyword">const</span> <span class="variable">config1</span> = <span class="keyword">new</span> <span class="function">RendererConfig</span>(<span class="string">'canvas1'</span>)<br>
+          &nbsp;&nbsp;.<span class="function">withDsl</span>(<span class="string">'fx::slide_in(Motion::RightToLeft, 10, 0, Color::Black, (800, Interpolation::QuadOut))'</span>)<br>
+          &nbsp;&nbsp;.<span class="function">withCanvas</span>(<span class="variable">ansiContent</span>)<br>
+          &nbsp;&nbsp;.<span class="function">withSleepBetweenReplay</span>(<span class="string">1500</span>);<br>
+          <span class="keyword">const</span> <span class="variable">renderer1</span> = <span class="function">createRenderer</span>(<span class="variable">config1</span>);<br>
           <br>
           <span class="comment">// Update to fade effect</span><br>
           <span class="variable">renderer1</span>.<span class="function">updateEffect</span>(<span class="string">'fx::fade_from_fg(Color::Black, (600, Interpolation::CubicOut))'</span>);<br>
@@ -325,12 +325,11 @@
           <button id="btn-canvas2-replay" class="primary">Play Effect</button>
         </div>
         <div class="code-snippet">
-          <span class="comment">// Create the renderer</span><br>
-          <span class="keyword">const</span> <span class="variable">renderer2</span> = <span class="function">createRenderer</span>(<br>
-          &nbsp;&nbsp;<span class="string">'canvas2'</span>,<br>
-          &nbsp;&nbsp;<span class="string">'fx::sweep_in(Motion::LeftToRight, 10, 0, Color::Black, (1200, Interpolation::QuadOut))'</span>,<br>
-          &nbsp;&nbsp;<span class="variable">ansiContent</span><br>
-          );<br>
+          <span class="comment">// Create the renderer with config</span><br>
+          <span class="keyword">const</span> <span class="variable">config2</span> = <span class="keyword">new</span> <span class="function">RendererConfig</span>(<span class="string">'canvas2'</span>)<br>
+          &nbsp;&nbsp;.<span class="function">withDsl</span>(<span class="string">'fx::sweep_in(Motion::LeftToRight, 10, 0, Color::Black, (1200, Interpolation::QuadOut))'</span>)<br>
+          &nbsp;&nbsp;.<span class="function">withCanvas</span>(<span class="variable">ansiContent</span>);<br>
+          <span class="keyword">const</span> <span class="variable">renderer2</span> = <span class="function">createRenderer</span>(<span class="variable">config2</span>);<br>
           <br>
           <span class="comment">// Replay current effect</span><br>
           <span class="variable">renderer2</span>.<span class="function">playEffect</span>();
@@ -354,8 +353,12 @@
         Each renderer loads different ANSI content and applies different effects from the DSL.
       </p>
       <p style="margin-top: 10px;">
-        <strong>Available Methods:</strong>
-        <code>createRenderer(container_id, dsl_code, canvas_content)</code>,
+        <strong>Available API:</strong>
+        <code>new RendererConfig(container_id)</code>,
+        <code>.withDsl(dsl_code)</code>,
+        <code>.withCanvas(canvas_content)</code>,
+        <code>.withSleepBetweenReplay(ms)</code>,
+        <code>createRenderer(config)</code>,
         <code>updateEffect(dsl_code)</code>,
         <code>playEffect()</code>,
         <code>destroy()</code>

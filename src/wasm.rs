@@ -65,36 +65,78 @@ fn remove_instance(id: u32) {
 }
 
 #[wasm_bindgen]
+pub struct RendererConfig {
+    container_id: String,
+    dsl_code: String,
+    canvas_content: String,
+    sleep_ms_between_replay: Option<u32>,
+}
+
+#[wasm_bindgen]
+impl RendererConfig {
+    #[wasm_bindgen(constructor)]
+    pub fn new(container_id: String) -> Self {
+        Self {
+            container_id,
+            dsl_code: String::new(),
+            canvas_content: String::new(),
+            sleep_ms_between_replay: None,
+        }
+    }
+
+    #[wasm_bindgen(js_name = withDsl)]
+    pub fn with_dsl(mut self, dsl_code: String) -> Self {
+        self.dsl_code = dsl_code;
+        self
+    }
+
+    #[wasm_bindgen(js_name = withCanvas)]
+    pub fn with_canvas(mut self, canvas_content: String) -> Self {
+        self.canvas_content = canvas_content;
+        self
+    }
+
+    #[wasm_bindgen(js_name = withSleepBetweenReplay)]
+    pub fn with_sleep_between_replay(mut self, sleep_ms: u32) -> Self {
+        self.sleep_ms_between_replay = Some(sleep_ms);
+        self
+    }
+}
+
+#[wasm_bindgen]
 pub struct TachyonFxRenderer {
     instance_id: u32,
 }
 
 #[wasm_bindgen(js_name = createRenderer)]
-pub fn create_renderer(
-    container_id: &str,
-    dsl_code: &str,
-    canvas_content: &str,
-) -> Result<TachyonFxRenderer, JsValue> {
+pub fn create_renderer(config: RendererConfig) -> Result<TachyonFxRenderer, JsValue> {
     std::panic::set_hook(Box::new(console_error_panic_hook::hook));
 
     let events = EventHandler::new(core::time::Duration::from_millis(33));
     let sender = events.sender();
 
     // Send initial events to set up canvas and effect
-    sender.dispatch(ReplaceCanvas(canvas_content.into()));
-    sender.dispatch(CompileDsl(dsl_code.into()));
+    sender.dispatch(ReplaceCanvas(config.canvas_content.clone()));
+    sender.dispatch(CompileDsl(config.dsl_code.clone()));
 
     // Create terminal for this container
-    let terminal = create_terminal(container_id, calculate_terminal_size(canvas_content)?)
-        .map_err(|e| JsValue::from_str(&format!("Failed to create terminal: {}", e)))?;
+    let terminal = create_terminal(
+        &config.container_id,
+        calculate_terminal_size(&config.canvas_content)?,
+    )
+    .map_err(|e| JsValue::from_str(&format!("Failed to create terminal: {}", e)))?;
 
     // Create running flag (starts as true)
     let running = Arc::new(AtomicBool::new(true));
     let running_clone = running.clone();
 
-    // Start render loop with state check
-    let mut app = App::new().sleep_between_replay(Duration::from_millis(2000));
+    let mut app = if let Some(ms) = config.sleep_ms_between_replay {
+        App::new().sleep_between_replay(Duration::from_millis(ms))
+    } else {
+        App::new()
+    };
 
+    // Start render loop with state check
     terminal.draw_web(move |frame| {
         // Only render if instance is running
         if !running_clone.load(Ordering::Relaxed) {
