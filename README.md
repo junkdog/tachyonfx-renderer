@@ -109,5 +109,5 @@ wasm-pack build --target web --out-dir pkg
 
 MIT
 
-[npm]: https://www.npmjs.com/package/tachyon-fxrenderer
+[npm]: https://www.npmjs.com/package/tachyonfx-renderer
 [NPM Badge]: https://img.shields.io/npm/v/tachyonfx-renderer.svg
