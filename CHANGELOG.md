@@ -1,4 +1,4 @@
-## tachyonfx-renderer 0.2.0 - TBD
+## tachyonfx-renderer 0.2.0 - 2025-10-18
 
 ### Breaking Changes
 - **API redesign**: `createRenderer` now accepts a `RendererConfig` object instead of multiple parameters
