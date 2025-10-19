@@ -1,6 +1,6 @@
 [package]
 name = "tachyonfx-renderer"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2024"
 description = "WebAssembly terminal effects renderer for the browser"
 license = "MIT"
@@ -28,6 +28,6 @@ branch = "main"
 [dependencies.tachyonfx]
 git = "https://github.com/junkdog/tachyonfx"
 branch = "development"
-version = "0.19.0"
+version = "0.20.0"
 default-features = false
 features = ["std", "dsl", "wasm"]
