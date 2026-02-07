@@ -8,7 +8,11 @@ use std::{
 };
 
 use ansi_to_tui::IntoText;
-use ratzilla::WebRenderer;
+use ratatui::style::Color;
+use ratzilla::{
+    WebRenderer,
+    backend::webgl2::{FontAtlasConfig, FontAtlasData, WebGl2BackendOptions},
+};
 use tachyonfx::Duration;
 use wasm_bindgen::prelude::*;
 
@@ -70,6 +74,10 @@ pub struct RendererConfig {
     dsl_code: String,
     canvas_content: String,
     sleep_ms_between_replay: Option<u32>,
+    font_families: Option<Vec<String>>,
+    font_size: Option<f32>,
+    canvas_padding_color: Option<u32>,
+    auto_resize_canvas_css: Option<bool>,
 }
 
 #[wasm_bindgen]
@@ -81,6 +89,10 @@ impl RendererConfig {
             dsl_code: String::new(),
             canvas_content: String::new(),
             sleep_ms_between_replay: None,
+            font_families: None,
+            font_size: None,
+            canvas_padding_color: None,
+            auto_resize_canvas_css: None,
         }
     }
 
@@ -101,6 +113,30 @@ impl RendererConfig {
         self.sleep_ms_between_replay = Some(sleep_ms);
         self
     }
+
+    // TODO: enable once ratzilla exposes cell size query for dynamic atlas
+    // #[wasm_bindgen(js_name = withDynamicFontAtlas)]
+    // pub fn with_dynamic_font_atlas(mut self, font_families: js_sys::Array, font_size: f32) -> Self {
+    //     let families: Vec<String> = font_families
+    //         .iter()
+    //         .filter_map(|v| v.as_string())
+    //         .collect();
+    //     self.font_families = Some(families);
+    //     self.font_size = Some(font_size);
+    //     self
+    // }
+
+    #[wasm_bindgen(js_name = withCanvasPaddingColor)]
+    pub fn with_canvas_padding_color(mut self, color: u32) -> Self {
+        self.canvas_padding_color = Some(color);
+        self
+    }
+
+    #[wasm_bindgen(js_name = withAutoResizeCanvasCss)]
+    pub fn with_auto_resize_canvas_css(mut self, enable: bool) -> Self {
+        self.auto_resize_canvas_css = Some(enable);
+        self
+    }
 }
 
 #[wasm_bindgen]
@@ -119,12 +155,12 @@ pub fn create_renderer(config: RendererConfig) -> Result<TachyonFxRenderer, JsVa
     sender.dispatch(ReplaceCanvas(config.canvas_content.clone()));
     sender.dispatch(CompileDsl(config.dsl_code.clone()));
 
-    // Create terminal for this container
-    let terminal = create_terminal(
-        &config.container_id,
-        calculate_terminal_size(&config.canvas_content)?,
-    )
-    .map_err(|e| JsValue::from_str(&format!("Failed to create terminal: {}", e)))?;
+    // Build backend options
+    let options = build_backend_options(&config)?;
+
+    // Create terminal with configured options
+    let terminal = create_terminal(options)
+        .map_err(|e| JsValue::from_str(&format!("Failed to create terminal: {}", e)))?;
 
     // Create running flag (starts as true)
     let running = Arc::new(AtomicBool::new(true));
@@ -154,6 +190,34 @@ pub fn create_renderer(config: RendererConfig) -> Result<TachyonFxRenderer, JsVa
     register_instance(instance_id, sender, running);
 
     Ok(TachyonFxRenderer { instance_id })
+}
+
+fn build_backend_options(config: &RendererConfig) -> Result<WebGl2BackendOptions, JsValue> {
+    let mut options = WebGl2BackendOptions::new().grid_id(&config.container_id);
+
+    // Calculate canvas size from content dimensions
+    let terminal_size = calculate_terminal_size(&config.canvas_content)?;
+    options = options.size(calculate_canvas_size(terminal_size));
+
+    // Font atlas configuration
+    if let Some(ref families) = config.font_families {
+        let font_size = config.font_size.unwrap_or(16.0);
+        let family_refs: Vec<&str> = families.iter().map(|s| s.as_str()).collect();
+        options = options.font_atlas_config(FontAtlasConfig::dynamic(&family_refs, font_size));
+    }
+
+    if let Some(hex) = config.canvas_padding_color {
+        let r = ((hex >> 16) & 0xFF) as u8;
+        let g = ((hex >> 8) & 0xFF) as u8;
+        let b = (hex & 0xFF) as u8;
+        options = options.canvas_padding_color(Color::Rgb(r, g, b));
+    }
+
+    if let Some(auto_resize) = config.auto_resize_canvas_css {
+        options = options.auto_resize_canvas_css(auto_resize);
+    }
+
+    Ok(options)
 }
 
 #[wasm_bindgen]
@@ -200,4 +264,12 @@ fn calculate_terminal_size(canvas: &str) -> Result<(u16, u16), JsValue> {
         .unwrap_or(0);
 
     Ok((cols as u16, rows as u16))
+}
+
+fn calculate_canvas_size(terminal_size: (u16, u16)) -> (u32, u32) {
+    let (w, h) = FontAtlasData::default().cell_size;
+    (
+        terminal_size.0 as u32 * (w as u32 - 2),
+        terminal_size.1 as u32 * (h as u32 - 2),
+    )
 }

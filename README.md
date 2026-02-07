@@ -48,6 +48,8 @@ Builder for renderer configuration.
 - `withDsl(dslCode)` - Set effect DSL (see [tachyonfx DSL docs][tfx-dsl] and [fx docs][fx-docs])
 - `withCanvas(ansiContent)` - Set ANSI-formatted text content
 - `withSleepBetweenReplay(sleepMs)` - Optional: Set milliseconds between automatic effect replays
+- `withCanvasPaddingColor(color)` - Optional: Set background color for canvas padding area (hex RGB, e.g. `0x1d2021`)
+- `withAutoResizeCanvasCss(enable)` - Optional: Control whether the renderer auto-sets canvas CSS dimensions on resize. Set to `false` when external CSS controls the canvas size
 
  [tfx-dsl]: https://github.com/junkdog/tachyonfx/blob/development/docs/dsl.md
  [fx-docs]: https://docs.rs/tachyonfx/latest/tachyonfx/fx/index.html

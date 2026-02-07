@@ -47,6 +47,8 @@ class RendererDemo {
     const config1 = new RendererConfig('canvas1')
       .withDsl(SLIDE_IN_EFFECT)
       .withCanvas(DEFAULT_CANVAS_ANSI)
+      // .withDynamicFontAtlas(["JetBrains Mono", "Fira Code"], 16.0)
+      .withCanvasPaddingColor(0x1d2021)
       .withSleepBetweenReplay(1500);
     this.renderer1 = createRenderer(config1);
 
