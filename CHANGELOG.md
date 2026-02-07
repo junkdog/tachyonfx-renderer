@@ -1,4 +1,11 @@
 ## tachyonfx-renderer 0.2.1 - 2025-10-18
+
+### Dependency Updates
+- tachyonfx 0.23.0
+- ratatui 0.3.0/ratzilla 0.3.0
+- beamterm 0.14.0
+
+## tachyonfx-renderer 0.2.1 - 2025-10-18
 - use tachyonfx 0.20.1
 
 ## tachyonfx-renderer 0.2.0 - 2025-10-18
