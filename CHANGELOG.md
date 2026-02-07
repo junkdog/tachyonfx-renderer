@@ -1,18 +1,18 @@
-## tachyonfx-renderer 0.3.0
+## tachyonfx-renderer 0.3.0 - 2026-02-07
 
 ### Features
 - `withCanvasPaddingColor(color)` - Set the background color for canvas padding area (hex RGB, e.g. `0x1d2021`)
 - `withAutoResizeCanvasCss(enable)` - Control whether the renderer auto-sets canvas CSS dimensions on resize
 
 ### Dependency Updates
-- ratzilla 0.3.0 (beamterm-latest branch)
+- tachyonfx 0.23.0
+- ratzilla 0.3.0
+- beamterm 0.14.0
 
 ## tachyonfx-renderer 0.2.1 - 2025-10-18
 
 ### Dependency Updates
-- tachyonfx 0.23.0
 - ratatui 0.3.0/ratzilla 0.3.0
-- beamterm 0.14.0
 
 ## tachyonfx-renderer 0.2.1 - 2025-10-18
 - use tachyonfx 0.20.1
