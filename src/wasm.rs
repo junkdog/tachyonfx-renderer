@@ -116,8 +116,8 @@ impl RendererConfig {
 
     // TODO: enable once ratzilla exposes cell size query for dynamic atlas
     // #[wasm_bindgen(js_name = withDynamicFontAtlas)]
-    // pub fn with_dynamic_font_atlas(mut self, font_families: js_sys::Array, font_size: f32) -> Self {
-    //     let families: Vec<String> = font_families
+    // pub fn with_dynamic_font_atlas(mut self, font_families: js_sys::Array, font_size: f32)
+    // -> Self {     let families: Vec<String> = font_families
     //         .iter()
     //         .filter_map(|v| v.as_string())
     //         .collect();
