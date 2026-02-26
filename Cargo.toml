@@ -23,6 +23,7 @@ web-time = "1.1.0"
 
 [dependencies.ratzilla]
 git = "https://github.com/junkdog/ratzilla"
+version = "0.3.0"
 branch = "beamterm-0.16.0"
 
 [dependencies.tachyonfx]
