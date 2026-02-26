@@ -22,11 +22,12 @@ web-sys = { version = "0.3.85", features = ["Location", "Window", "console"] }
 web-time = "1.1.0"
 
 [dependencies.ratzilla]
-path = "../ratzilla"
+git = "https://github.com/junkdog/ratzilla"
+branch = "beamterm-0.16.0"
 
 [dependencies.tachyonfx]
-# git = "https://github.com/ratatui/tachyonfx"
-# branch = "development"
-version = "0.23.0"
+git = "https://github.com/ratatui/tachyonfx"
+branch = "development"
+# version = "0.24.0"
 default-features = false
 features = ["std", "dsl", "wasm"]
