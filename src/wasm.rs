@@ -21,7 +21,7 @@ use crate::{
     dispatcher::Dispatcher,
     event::AppEvent::{self, *},
     event_handler::EventHandler,
-    terminal::create_terminal,
+    terminal::{create_terminal, create_terminal_with_resize},
 };
 
 // Global instance ID counter
@@ -114,17 +114,16 @@ impl RendererConfig {
         self
     }
 
-    // TODO: enable once ratzilla exposes cell size query for dynamic atlas
-    // #[wasm_bindgen(js_name = withDynamicFontAtlas)]
-    // pub fn with_dynamic_font_atlas(mut self, font_families: js_sys::Array, font_size: f32)
-    // -> Self {     let families: Vec<String> = font_families
-    //         .iter()
-    //         .filter_map(|v| v.as_string())
-    //         .collect();
-    //     self.font_families = Some(families);
-    //     self.font_size = Some(font_size);
-    //     self
-    // }
+    #[wasm_bindgen(js_name = withDynamicFontAtlas)]
+    pub fn with_dynamic_font_atlas(mut self, font_families: js_sys::Array, font_size: f32) -> Self {
+        let families: Vec<String> = font_families
+            .iter()
+            .filter_map(|v| v.as_string())
+            .collect();
+        self.font_families = Some(families);
+        self.font_size = Some(font_size);
+        self
+    }
 
     #[wasm_bindgen(js_name = withCanvasPaddingColor)]
     pub fn with_canvas_padding_color(mut self, color: u32) -> Self {
@@ -155,12 +154,18 @@ pub fn create_renderer(config: RendererConfig) -> Result<TachyonFxRenderer, JsVa
     sender.dispatch(ReplaceCanvas(config.canvas_content.clone()));
     sender.dispatch(CompileDsl(config.dsl_code.clone()));
 
-    // Build backend options
-    let options = build_backend_options(&config)?;
+    // Build backend options and terminal size
+    let terminal_size = calculate_terminal_size(&config.canvas_content)?;
+    let options = build_backend_options(&config, terminal_size)?;
+    let has_dynamic_atlas = config.font_families.is_some();
 
-    // Create terminal with configured options
-    let terminal = create_terminal(options)
-        .map_err(|e| JsValue::from_str(&format!("Failed to create terminal: {}", e)))?;
+    // Create terminal: dynamic atlas needs post-creation resize
+    let terminal = if has_dynamic_atlas {
+        create_terminal_with_resize(options, terminal_size)
+    } else {
+        create_terminal(options)
+    }
+    .map_err(|e| JsValue::from_str(&format!("Failed to create terminal: {}", e)))?;
 
     // Create running flag (starts as true)
     let running = Arc::new(AtomicBool::new(true));
@@ -192,12 +197,16 @@ pub fn create_renderer(config: RendererConfig) -> Result<TachyonFxRenderer, JsVa
     Ok(TachyonFxRenderer { instance_id })
 }
 
-fn build_backend_options(config: &RendererConfig) -> Result<WebGl2BackendOptions, JsValue> {
+fn build_backend_options(
+    config: &RendererConfig,
+    terminal_size: (u16, u16),
+) -> Result<WebGl2BackendOptions, JsValue> {
     let mut options = WebGl2BackendOptions::new().grid_id(&config.container_id);
 
-    // Calculate canvas size from content dimensions
-    let terminal_size = calculate_terminal_size(&config.canvas_content)?;
-    options = options.size(calculate_canvas_size(terminal_size));
+    // Set canvas size for static atlas; dynamic atlas will resize after creation
+    if config.font_families.is_none() {
+        options = options.size(calculate_canvas_size(terminal_size));
+    }
 
     // Font atlas configuration
     if let Some(ref families) = config.font_families {
@@ -213,8 +222,8 @@ fn build_backend_options(config: &RendererConfig) -> Result<WebGl2BackendOptions
         options = options.canvas_padding_color(Color::Rgb(r, g, b));
     }
 
-    if let Some(auto_resize) = config.auto_resize_canvas_css {
-        options = options.auto_resize_canvas_css(auto_resize);
+    if config.auto_resize_canvas_css == Some(false) {
+        options = options.disable_auto_css_resize();
     }
 
     Ok(options)

@@ -22,8 +22,7 @@ web-sys = { version = "0.3.85", features = ["Location", "Window", "console"] }
 web-time = "1.1.0"
 
 [dependencies.ratzilla]
-git = "https://github.com/junkdog/ratzilla"
-branch = "beamterm-latest"
+path = "../ratzilla"
 
 [dependencies.tachyonfx]
 # git = "https://github.com/ratatui/tachyonfx"
