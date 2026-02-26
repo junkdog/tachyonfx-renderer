@@ -28,6 +28,6 @@ branch = "beamterm-0.16.0"
 [dependencies.tachyonfx]
 git = "https://github.com/ratatui/tachyonfx"
 branch = "development"
-# version = "0.24.0"
+version = "0.24.0"
 default-features = false
 features = ["std", "dsl", "wasm"]
