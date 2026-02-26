@@ -1,3 +1,17 @@
+## tachyonfx-renderer 0.4.0 - 2026-02-26
+
+### Features
+- `withDynamicFontAtlas(fontFamilies, fontSize)` - Configure a dynamic font atlas with custom font families and size, enabling proper glyph rendering for user-specified fonts
+- Post-creation canvas resize when using dynamic font atlas, ensuring correct dimensions once cell size is known
+
+### Changes
+- `withAutoResizeCanvasCss` adapted to upstream ratzilla API change (`disable_auto_css_resize()`)
+
+### Dependency Updates
+- ratzilla: `junkdog/beamterm-0.16.0` branch
+- tachyonfx: 0.25.0 pre-release (devevelopment branch)
+- beamterm 0.16.0
+
 ## tachyonfx-renderer 0.3.0 - 2026-02-07
 
 ### Features
